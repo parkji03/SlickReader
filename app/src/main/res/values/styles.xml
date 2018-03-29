@@ -8,6 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="PrimaryButton" parent="Theme.AppCompat">
         <item name="android:padding">16dp</item>
         <item name="colorButtonNormal">@color/colorPrimary</item>
