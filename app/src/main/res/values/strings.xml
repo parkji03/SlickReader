@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Slick Reader</string>
+
+    <string name="filler">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dolor urna, laoreet vel ipsum lacinia, auctor vulputate eros. Nam nec mauris eget lectus porttitor aliquam. Proin lacinia, ex sed ultrices malesuada, neque lacus aliquet tortor, eu interdum sem neque eget mi. Duis nec dolor consequat, semper felis quis, rhoncus risus. Praesent velit nisi, pulvinar et ipsum posuere, tempus condimentum leo. Sed a lacus blandit, maximus augue quis, suscipit orci. Nam tortor nulla, placerat sit amet tincidunt ut, dignissim at odio. Proin ac pellentesque nulla. Ut faucibus interdum interdum. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Morbi euismod ligula ac massa rutrum dapibus vitae vel leo. Vestibulum quis nunc ac odio pulvinar vestibulum in ut est. Proin ut neque vel felis bibendum iaculis eget vitae ante. Donec molestie dignissim ipsum quis semper. Duis iaculis arcu vel est dignissim, nec convallis metus mattis. Donec ut erat non felis iaculis fringilla.
+
+Cras urna leo, pretium vel pellentesque eu, dictum eget quam. In hac habitasse platea dictumst. Nunc sit amet pellentesque libero, ac aliquam orci. Aliquam ultrices tellus quis odio volutpat congue. Nunc eu metus suscipit, semper justo at, blandit metus. Sed hendrerit aliquam lectus, ac efficitur neque. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nam vitae nisi est. Sed at massa at lorem laoreet interdum. Nulla vitae dui tristique, lobortis velit feugiat, gravida urna. Aliquam porta mi neque, fermentum vulputate magna commodo sed. Pellentesque cursus feugiat nisi eu sodales. Aenean consectetur quam sit amet pharetra porttitor.
+
+Maecenas semper odio eget dui eleifend iaculis. Vivamus id nunc rutrum, fermentum nisi vitae, pellentesque justo. Proin ornare tempor libero vitae volutpat. In eleifend iaculis varius. Quisque et nunc posuere, lacinia velit non, vestibulum augue. Aenean id diam risus. Nam posuere enim eu arcu tincidunt gravida.
+
+Nulla non interdum eros, vel egestas sapien. Praesent ac nisi lacinia, semper nisl ut, convallis odio. Aliquam quis imperdiet velit, ut volutpat purus. Morbi aliquam justo nec pellentesque elementum. Proin dignissim auctor nisl vel scelerisque. Aenean blandit scelerisque risus, et aliquam dolor bibendum et. Suspendisse auctor dolor nec interdum consequat. Integer cursus, diam ac gravida consectetur, sem nulla lobortis nisi, at semper turpis lorem non urna. Ut tristique ullamcorper ligula sit amet mollis.
+
+Morbi nibh risus, elementum tempor pharetra vitae, pharetra at metus. Curabitur non nulla viverra, vestibulum quam in, sodales elit. Nullam vel pulvinar neque. Ut vel tincidunt justo. Suspendisse vulputate gravida nunc, eu finibus sem tincidunt id. Sed quis elit vulputate, interdum ex a, maximus augue. Pellentesque consectetur, elit non lacinia finibus, erat tortor condimentum lorem, condimentum luctus dui tortor ut nibh. Etiam id odio mauris. Morbi eleifend sapien ipsum, at molestie enim lobortis nec. Fusce mollis tincidunt mi, non luctus erat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Duis in mauris dignissim, consectetur lectus at, imperdiet ex. Pellentesque placerat libero turpis, et ornare dolor gravida non. Pellentesque vel.</string>
+
+    <string name="text_choose_image">Select an image to begin</string>
+
+    <!--  Menu  -->
+    <string name="menu_info">Info</string>
+
+    <!--  Descriptions -->
+    <string name="img_ocr_text_description">Image view that holds the image for the ocr text recognition.</string>
+    <string name="btn_play_description">Play button.</string>
+    <string name="btn_rewind_description">Rewind button.</string>
+    <string name="btn_forward_description">Forward button.</string>
+
 </resources>

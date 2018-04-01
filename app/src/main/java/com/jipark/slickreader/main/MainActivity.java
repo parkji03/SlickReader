@@ -21,6 +21,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.jipark.slickreader.R;
 import com.jipark.slickreader.intro.IntroActivity;
+import com.jipark.slickreader.ocr.ImageReaderActivity;
 
 import java.io.IOException;
 
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         thread.start();
+
+        startActivity(new Intent(this, ImageReaderActivity.class));
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 

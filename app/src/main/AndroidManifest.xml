@@ -11,16 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
-            android:name=".intro.IntroActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-
+            android:name=".intro.IntroActivity" />
         <activity
             android:name=".main.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -29,5 +27,9 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
+        <activity
+            android:name=".ocr.ImageReaderActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
+
 </manifest>
