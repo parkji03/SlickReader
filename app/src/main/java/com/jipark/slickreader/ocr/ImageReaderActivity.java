@@ -3,12 +3,14 @@ package com.jipark.slickreader.ocr;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.Frame;
@@ -29,7 +32,9 @@ import com.google.android.gms.vision.text.TextRecognizer;
 import com.jipark.slickreader.R;
 import com.jipark.slickreader.intro.IntroActivity;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -37,6 +42,8 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
 
     private final String TAG = "ImageReaderActivity";
     private final int PICK_IMAGE_REQUEST = 71;
+    private final String ROOT_DIR = Environment.getExternalStorageDirectory().getAbsolutePath();
+    private final String destinationFileName = ROOT_DIR + "/slickreader.wav";
 
     private FloatingActionButton mSelectImageFab;
     private AppBarLayout mAppBarLayout;
@@ -47,8 +54,10 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
     private ImageButton mPlayButton;
     private ImageButton mRewindButton;
     private ImageButton mFastForwardButton;
+    private ProgressBar mLoadingOcrText;
 
     private TextToSpeech tts;
+    private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
 
     @Override
@@ -84,7 +93,6 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
                 mOcrImage.setImageBitmap(bitmap);
                 mChooseImageText.setVisibility(View.INVISIBLE);
                 convertImageToText(bitmap);
-                enablePlayButtons(true);
             } catch (IOException err) {
                 err.printStackTrace();
             }
@@ -142,7 +150,57 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
                 sb.append('\n');
             }
             mOcrText.setText(sb.toString());
-            enablePlayButtons(true);
+            HashMap<String, String> hashRender = new HashMap<>();
+            hashRender.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, mOcrText.getText().toString());
+            File soundFile = new File(destinationFileName);
+            if (soundFile.exists())
+                soundFile.delete();
+
+            if (tts.synthesizeToFile(mOcrText.getText().toString(), hashRender, destinationFileName) == TextToSpeech.SUCCESS) {
+                mPlayButton.setVisibility(View.GONE);
+                mRewindButton.setVisibility(View.GONE);
+                mFastForwardButton.setVisibility(View.GONE);
+                mLoadingOcrText.setVisibility(View.VISIBLE);
+
+                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    @Override
+                    public void onStart(String s) {
+
+                    }
+
+                    @Override
+                    public void onDone(String s) {
+                        try {
+                            mediaPlayer.setDataSource(destinationFileName);
+                            mediaPlayer.prepare();
+
+                            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                @Override
+                                public void onPrepared(MediaPlayer mediaPlayer) {
+                                }
+                            });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mPlayButton.setVisibility(View.VISIBLE);
+                                mRewindButton.setVisibility(View.VISIBLE);
+                                mFastForwardButton.setVisibility(View.VISIBLE);
+                                mLoadingOcrText.setVisibility(View.GONE);
+                                enablePlayButtons(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String s) {
+
+                    }
+                });
+            }
         } else {
             Log.d(TAG, "Text recognizer is not operational.");
         }
@@ -158,8 +216,17 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         mPlayButton = findViewById(R.id.btn_play);
         mFastForwardButton = findViewById(R.id.btn_forward);
         mRewindButton = findViewById(R.id.btn_rewind);
+        mLoadingOcrText = findViewById(R.id.progress_loading_ocr_text);
 
         tts = new TextToSpeech(this, this);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mPlayButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                isPlaying = false;
+            }
+        });
     }
 
     private void setImageButtonEnabled(Context context, boolean enabled, ImageButton imageButton, int iconResId) {
@@ -220,14 +287,11 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
             public void onClick(View view) {
                 if (isPlaying) {
                     mPlayButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
-                    // Pause
-//                    tts.stop();
-                    tts.playSilentUtterance(2000, TextToSpeech.QUEUE_FLUSH, null);
-
+                    mediaPlayer.pause();
                 }
                 else {
                     mPlayButton.setImageResource(R.drawable.ic_pause_white_24dp);
-                    tts.speak(mOcrText.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    mediaPlayer.start();
                 }
                 isPlaying = !isPlaying;
             }
@@ -236,14 +300,24 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         mRewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if (isPlaying) {
+                    int rewindPosition = mediaPlayer.getCurrentPosition() - 3000;
+                    if (rewindPosition < 0) {
+                        mediaPlayer.seekTo(0);
+                    } else {
+                        mediaPlayer.seekTo(rewindPosition);
+                    }
+                }
             }
         });
 
         mFastForwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // tts.setSpeechRate(2);
+                if (isPlaying) {
+                    int forwardPosition = mediaPlayer.getCurrentPosition() + 3000;
+                    mediaPlayer.seekTo(forwardPosition);
+                }
             }
         });
     }

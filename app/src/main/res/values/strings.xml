@@ -21,5 +21,7 @@ Morbi nibh risus, elementum tempor pharetra vitae, pharetra at metus. Curabitur 
     <string name="btn_play_description">Play button.</string>
     <string name="btn_rewind_description">Rewind button.</string>
     <string name="btn_forward_description">Forward button.</string>
+    <string name="btn_skip_previous_description">Skip previous button.</string>
+
 
 </resources>

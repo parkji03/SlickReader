@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SparseArray;
@@ -27,10 +28,13 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int REQUEST_PERMISSION_CAMERA_ID = 1001;
+    private final int REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 1002;
+    private final int ASK_MULTIPLE_PERMISSION_REQUEST_CODE = 1003;
+
     private SurfaceView cameraView;
     private TextView textView;
     private CameraSource cameraSource;
-    private final int REQUEST_PERMISSION_CAMERA_ID = 1001;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -55,6 +59,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        requestPermissions(new String[] {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE }, ASK_MULTIPLE_PERMISSION_REQUEST_CODE);
+//        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(MainActivity.this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE);
+//        }
 
         Thread thread = new Thread(new Runnable() {
             @Override
