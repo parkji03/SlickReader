@@ -23,7 +23,6 @@
         <item name="colorButtonNormal">@color/colorPrimary</item>
         <item name="colorControlHighlight">@color/colorPrimary</item>
         <item name="android:textColorHint">@color/colorWhite</item>
-
     </style>
 
     <style name="PrimaryFlatButton" parent="Theme.AppCompat.Light">
@@ -31,7 +30,10 @@
         <item name="colorControlHighlight">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="android:textColorHint">@color/colorPrimary</item>
+    </style>
 
+    <style name="SelectableItemTheme">
+        <item name="android:colorControlHighlight">@color/colorWhite</item>
     </style>
 
 </resources>

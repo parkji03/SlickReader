@@ -1,56 +1,84 @@
-<!--<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--tools:context="com.jipark.slickreader.main.MainActivity">-->
-
-    <!--<SurfaceView-->
-        <!--android:id="@+id/surface_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
-
-    <!--<TextView-->
-        <!--android:gravity="center_horizontal"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="No Text"-->
-        <!--android:id="@+id/text_view"/>-->
-
-<!--</android.support.constraint.ConstraintLayout>-->
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.jipark.slickreader.main.MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="3"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="4">
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1">
-        <SurfaceView
-        android:id="@+id/surface_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="3">
+
+        <TextureView
+            android:id="@+id/texture_camera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1">
-
-        <TextView
-        android:gravity="center_horizontal"
+    <RelativeLayout
+        android:background="@color/colorBlack"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="No Text"
-        android:id="@+id/text_view"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center">
 
-    </LinearLayout>
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="1">
 
+            <TableRow
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dip"
+                    android:layout_weight="1">
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:gravity="center_horizontal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dip"
+                    android:layout_weight="1">
+
+                    <ImageButton
+                        android:theme="@style/SelectableItemTheme"
+                        android:id="@+id/btn_take_photo"
+                        android:layout_margin="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_panorama_fish_eye_white_100dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/btn_take_photo_description"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_height="match_parent"
+                    android:layout_width="0dip"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/txt_skip_take_photo"
+                        android:theme="@style/SelectableItemTheme"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="16sp"
+                        android:layout_margin="8dp"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:text="@string/text_skip_take_photo"
+                        android:textColor="@color/colorWhite"/>
+                </LinearLayout>
+            </TableRow>
+        </TableLayout>
+    </RelativeLayout>
 </LinearLayout>

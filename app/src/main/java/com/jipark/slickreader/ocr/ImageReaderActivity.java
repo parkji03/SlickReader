@@ -3,6 +3,7 @@ package com.jipark.slickreader.ocr;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -74,14 +75,29 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         // Binding onClick listeners for available buttons
         bindOnClickListeners();
 
-        // Toolbar setup
-        bindToolbar();
-
         // Hide or show FAB on scroll
         showFab();
 
         // Disable play buttons
         enablePlayButtons(false);
+
+        if (getIntent().hasExtra("IMAGE_PATH")) {
+            String fromExtra = getIntent().getExtras().getString("IMAGE_PATH");
+            if (fromExtra != null && !fromExtra.isEmpty()) {
+                Uri filePath = Uri.fromFile(new File(fromExtra));
+                try {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                    Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                    mOcrImage.setImageBitmap(rotatedBitmap);
+                    mChooseImageText.setVisibility(View.INVISIBLE);
+                    convertImageToText(rotatedBitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -320,5 +336,14 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 }

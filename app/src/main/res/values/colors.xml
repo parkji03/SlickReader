@@ -10,4 +10,5 @@
     <color name="colorBackgroundLight">#F5F5F5</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorDisabledButton">#BBBBBB</color>
+    <color name="colorBlack">#000000</color>
 </resources>
