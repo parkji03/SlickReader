@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.camera2.CameraCaptureSession;
@@ -256,6 +257,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             previewSession.setRepeatingRequest(previewBuilder.build(), null, handler);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -320,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
 
+
             ImageReader.OnImageAvailableListener imageAvailableListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
@@ -375,7 +379,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, Objects.requireNonNull(result));
-                    startCamera();
                 }
             };
             cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {

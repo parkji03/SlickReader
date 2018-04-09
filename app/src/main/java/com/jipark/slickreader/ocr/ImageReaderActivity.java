@@ -56,6 +56,7 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
     private ImageButton mRewindButton;
     private ImageButton mFastForwardButton;
     private ProgressBar mLoadingOcrText;
+    private ProgressBar mLoadingTts;
 
     private TextToSpeech tts;
     private MediaPlayer mediaPlayer;
@@ -69,6 +70,8 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         // Binding views to activity
         bindActivity();
 
+        isLoadingTts(true);
+
         // Binding support toolbar
         bindToolbar();
 
@@ -81,23 +84,6 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         // Disable play buttons
         enablePlayButtons(false);
 
-        if (getIntent().hasExtra("IMAGE_PATH")) {
-            String fromExtra = getIntent().getExtras().getString("IMAGE_PATH");
-            if (fromExtra != null && !fromExtra.isEmpty()) {
-                Uri filePath = Uri.fromFile(new File(fromExtra));
-                try {
-                    Matrix matrix = new Matrix();
-                    matrix.postRotate(90);
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                    Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                    mOcrImage.setImageBitmap(rotatedBitmap);
-                    mChooseImageText.setVisibility(View.INVISIBLE);
-                    convertImageToText(rotatedBitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     @Override
@@ -105,6 +91,15 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri filePath = data.getData();
             try {
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        mPlayButton.setImageResource(R.drawable.ic_play_arrow_white_24dp);
+                        isPlaying = false;
+                    }
+                });
+
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
                 mOcrImage.setImageBitmap(bitmap);
                 mChooseImageText.setVisibility(View.INVISIBLE);
@@ -147,6 +142,24 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Log.d(TAG, "Language is not supported");
             } else {
+                isLoadingTts(false);
+                if (getIntent().hasExtra("IMAGE_PATH")) {
+                    String fromExtra = getIntent().getExtras().getString("IMAGE_PATH");
+                    if (fromExtra != null && !fromExtra.isEmpty()) {
+                        Uri filePath = Uri.fromFile(new File(fromExtra));
+                        try {
+                            Matrix matrix = new Matrix();
+                            matrix.postRotate(90);
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                            Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                            mOcrImage.setImageBitmap(rotatedBitmap);
+                            mChooseImageText.setVisibility(View.INVISIBLE);
+                            convertImageToText(rotatedBitmap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         } else {
             // Disable the play buttons until mOcrText is not null
@@ -233,6 +246,7 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         mFastForwardButton = findViewById(R.id.btn_forward);
         mRewindButton = findViewById(R.id.btn_rewind);
         mLoadingOcrText = findViewById(R.id.progress_loading_ocr_text);
+        mLoadingTts = findViewById(R.id.progress_loading_tts);
 
         tts = new TextToSpeech(this, this);
         mediaPlayer = new MediaPlayer();
@@ -345,5 +359,16 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
             tts.shutdown();
         }
         super.onDestroy();
+    }
+
+    private void isLoadingTts(boolean isLoading) {
+        if (isLoading) {
+            mChooseImageText.setVisibility(View.GONE);
+            mLoadingTts.setVisibility(View.VISIBLE);
+
+        } else {
+            mChooseImageText.setVisibility(View.VISIBLE);
+            mLoadingTts.setVisibility(View.GONE);
+        }
     }
 }
