@@ -21,17 +21,28 @@ android {
 }
 
 dependencies {
+
     // Google Material Design
-    implementation 'com.android.support:design:27.1.0'
-    implementation 'com.android.support:cardview-v7:27.1.0'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:cardview-v7:27.1.1'
+
     // Google Vision Library
-    implementation 'com.google.android.gms:play-services-vision:12.0.0'
+    implementation 'com.google.android.gms:play-services-vision:12.0.1'
+
     // AppIntro
     implementation 'com.github.apl-devs:appintro:v4.2.3'
+
+    // PocketSphinx CMU
+    implementation project(':pocketsphinx-android-5prealpha-release')
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 }
+
+ant.importBuild 'assets.xml'
+preBuild.dependsOn(list, checksum)
+clean.dependsOn(clean_assets)
