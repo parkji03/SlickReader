@@ -13,9 +13,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_headset_48dp"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_headset_48dp"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -38,6 +38,5 @@
         <activity
             android:name=".ocr.ImageReaderActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <service android:name=".ocr.VoiceRecognizerService" />
     </application>
 </manifest>

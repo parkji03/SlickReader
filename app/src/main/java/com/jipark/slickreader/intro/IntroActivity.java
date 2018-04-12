@@ -12,6 +12,8 @@ import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 import com.jipark.slickreader.R;
 
+import java.util.Objects;
+
 public class IntroActivity extends AppIntro {
 
     private final int ASK_MULTIPLE_PERMISSION_REQUEST_CODE = 1003;
@@ -20,9 +22,11 @@ public class IntroActivity extends AppIntro {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addSlide(AppIntroFragment.newInstance("Slide 1", "Description", R.mipmap.ic_launcher, getResources().getColor(R.color.colorAccent)));
-        addSlide(AppIntroFragment.newInstance("Slide 2", "Description", R.mipmap.ic_launcher, getResources().getColor(R.color.colorAccent)));
-        addSlide(AppIntroFragment.newInstance("Slide 3", "Description", R.mipmap.ic_launcher, getResources().getColor(R.color.colorAccent)));
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Slick Reader Instructions");
+
+        addSlide(AppIntroFragment.newInstance("1. Take a photo of text", "Better quality photos will create better audio!", R.drawable.ic_photo_camera_white_100dp, getResources().getColor(R.color.colorAccent)));
+        addSlide(AppIntroFragment.newInstance("2. Press play", "Pause, rewind, fast forward anytime!", R.drawable.ic_play_arrow_white_100dp, getResources().getColor(R.color.colorPrimaryLight)));
+        addSlide(AppIntroFragment.newInstance("3. Listen", "Easy and simple.", R.drawable.ic_hearing_white_100dp, getResources().getColor(R.color.colorAccent)));
 
         // Ask for permissions
         requestPermissions(new String[]{
