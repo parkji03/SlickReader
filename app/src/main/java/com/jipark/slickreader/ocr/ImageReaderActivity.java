@@ -1,5 +1,7 @@
 package com.jipark.slickreader.ocr;
 
+import android.app.KeyguardManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,7 +12,10 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.AppBarLayout;
@@ -23,6 +28,8 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -38,6 +45,7 @@ import com.jipark.slickreader.intro.IntroActivity;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
@@ -50,20 +58,18 @@ import edu.cmu.pocketsphinx.SpeechRecognizerSetup;
 
 import static android.widget.Toast.makeText;
 
-public class ImageReaderActivity extends AppCompatActivity implements TextToSpeech.OnInitListener, RecognitionListener {
+public class ImageReaderActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
 
     private final String TAG = "ImageReaderActivity";
+
     private final int PICK_IMAGE_REQUEST = 71;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
+
     private final String ROOT_DIR = Environment.getExternalStorageDirectory().getAbsolutePath();
     private final String destinationFileName = ROOT_DIR + "/slickreader.wav";
 
-    private static final String KWS_SEARCH = "wakeup";
-    private static final String FORECAST_SEARCH = "forecast";
-    private static final String DIGITS_SEARCH = "digits";
-    private static final String PHONE_SEARCH = "phones";
-    private static final String MENU_SEARCH = "menu";
-
-    private static final String KEYPHRASE = "oh mighty computer";
+//    private static final String KWS_SEARCH = "wakeup";
+//    private static final String KEYPHRASE = "hey google";
 
     private FloatingActionButton mSelectImageFab;
     private AppBarLayout mAppBarLayout;
@@ -82,8 +88,13 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
     private boolean isPlaying = false;
 
     // PocketSphinx
-    private SpeechRecognizer recognizer;
-    private HashMap<String, Integer> captions;
+//    private SpeechRecognizer recognizer;
+//    private HashMap<String, Integer> captions;
+//
+//    // WakeLock
+//    private PowerManager.WakeLock wakeLock;
+//
+//    KeyguardManager.KeyguardLock keyguard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,21 +118,37 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         // Disable play buttons
         enablePlayButtons(false);
 
-        // TODO: fix this later
-        // Prepare the data for UI
-        captions = new HashMap<>();
-        captions.put(KWS_SEARCH, R.string.kws_caption);
-        captions.put(MENU_SEARCH, R.string.menu_caption);
-        captions.put(DIGITS_SEARCH, R.string.digits_caption);
-        captions.put(PHONE_SEARCH, R.string.phone_caption);
-        captions.put(FORECAST_SEARCH, R.string.forecast_caption);
-
-        new SetupTask(this).execute();
+//        // TODO: fix this later
+//
+//        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//        wakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+//        wakeLock.acquire();
+////        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+////        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WAKELOCK_TAG");
+////        wakeLock.acquire();
+//
+//        getWindow().addFlags(
+//                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+//                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+//                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+//
+//        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+//        keyguard = km.newKeyguardLock("myapp");
+//        keyguard.disableKeyguard();
+//
+//        // TODO: fix this later
+//        // Prepare the data for UI
+//        captions = new HashMap<>();
+//        captions.put(KWS_SEARCH, R.string.kws_caption);
+//
+//        new SetupTask(this).execute();
 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("REQUEST", requestCode + " ");
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri filePath = data.getData();
             try {
@@ -142,6 +169,12 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
                 err.printStackTrace();
             }
         }
+//        else if (requestCode == REQ_CODE_SPEECH_INPUT && resultCode == RESULT_OK && data != null) {
+//            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+//            for (String i : result) {
+//                Log.d("REQ_CODE_SPEECH_INPUT", i);
+//            }
+//        }
     }
 
     @Override
@@ -395,10 +428,12 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
             tts.shutdown();
         }
 
-        if (recognizer != null) {
-            recognizer.cancel();
-            recognizer.shutdown();
-        }
+//        if (recognizer != null) {
+//            recognizer.cancel();
+//            recognizer.shutdown();
+//        }
+//
+//        wakeLock.release();
     }
 
     private void isLoadingTts(boolean isLoading) {
@@ -412,128 +447,114 @@ public class ImageReaderActivity extends AppCompatActivity implements TextToSpee
         }
     }
 
-    @Override
-    public void onBeginningOfSpeech() {
-
-    }
-
-    @Override
-    public void onEndOfSpeech() {
-        if (!recognizer.getSearchName().equals(KWS_SEARCH))
-            switchSearch(KWS_SEARCH);
-    }
-
-    @Override
-    public void onPartialResult(Hypothesis hypothesis) {
-        if (hypothesis == null)
-            return;
-
-        String text = hypothesis.getHypstr();
-        if (text.equals(KEYPHRASE))
-            switchSearch(MENU_SEARCH);
-        else if (text.equals(DIGITS_SEARCH))
-            switchSearch(DIGITS_SEARCH);
-        else if (text.equals(PHONE_SEARCH))
-            switchSearch(PHONE_SEARCH);
-        else if (text.equals(FORECAST_SEARCH))
-            switchSearch(FORECAST_SEARCH);
-        else
-            ((TextView) findViewById(R.id.result_text)).setText(text);
-    }
-
-    @Override
-    public void onResult(Hypothesis hypothesis) {
-        ((TextView) findViewById(R.id.result_text)).setText("");
-        if (hypothesis != null) {
-            String text = hypothesis.getHypstr();
-            makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onError(Exception e) {
-        ((TextView) findViewById(R.id.caption_text)).setText(e.getMessage());
-    }
-
-    @Override
-    public void onTimeout() {
-        switchSearch(KWS_SEARCH);
-    }
-
-    private static class SetupTask extends AsyncTask<Void, Void, Exception> {
-        WeakReference<ImageReaderActivity> activityReference;
-        SetupTask(ImageReaderActivity activity) {
-            this.activityReference = new WeakReference<>(activity);
-        }
-        @Override
-        protected Exception doInBackground(Void... params) {
-            try {
-                Assets assets = new Assets(activityReference.get());
-                File assetDir = assets.syncAssets();
-                activityReference.get().setupRecognizer(assetDir);
-            } catch (IOException e) {
-                return e;
-            }
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Exception result) {
-            if (result != null) {
+//    @Override
+//    public void onBeginningOfSpeech() {
+//
+//    }
+//
+//    @Override
+//    public void onEndOfSpeech() {
+//        if (!recognizer.getSearchName().equals(KWS_SEARCH)) {
+////            recognizer.stop();
+////            recognizer.startListening(KWS_SEARCH, 10000);
+//        }
+////        Log.d("VOICE RECOG", "end of speech");
+//
+//    }
+//
+//    @Override
+//    public void onPartialResult(Hypothesis hypothesis) {
+//        if (hypothesis == null)
+//            return;
+//
+//        String text = hypothesis.getHypstr();
+//        Log.d("VOICE RECOGNITION", text);
+//
+//        if (text.equals(KEYPHRASE)) {
+//            recognizer.stop();
+//
+//            final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+//            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+//            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.US);
+//            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt));
+//            try {
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+//                    }
+//                }, 4000);
+//            } catch (ActivityNotFoundException a) {
+//                Toast.makeText(getApplicationContext(), "speech not supported", Toast.LENGTH_SHORT).show();
+//            }
+////            recognizer.startListening(KWS_SEARCH, 10000);
+//        }
+//    }
+//
+//    @Override
+//    public void onResult(Hypothesis hypothesis) {
+//        ((TextView) findViewById(R.id.result_text)).setText("");
+//        if (hypothesis != null) {
+//            String text = hypothesis.getHypstr();
+//            Log.d("VOICE RECOG", text);
+//            makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+//        }
+//    }
+//
+//    @Override
+//    public void onError(Exception e) {
+//        ((TextView) findViewById(R.id.caption_text)).setText(e.getMessage());
+//    }
+//
+//    @Override
+//    public void onTimeout() {
+//        Log.d("VOICE RECOG", "Time out");
+//        recognizer.stop();
+//        recognizer.startListening(KWS_SEARCH, 10000);
+//    }
+//
+//    private static class SetupTask extends AsyncTask<Void, Void, Exception> {
+//        WeakReference<ImageReaderActivity> activityReference;
+//
+//        SetupTask(ImageReaderActivity activity) {
+//            this.activityReference = new WeakReference<>(activity);
+//        }
+//
+//        @Override
+//        protected Exception doInBackground(Void... params) {
+//            try {
+//                Assets assets = new Assets(activityReference.get());
+//                File assetDir = assets.syncAssets();
+//                activityReference.get().setupRecognizer(assetDir);
+//            } catch (IOException e) {
+//                return e;
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Exception result) {
+//            if (result != null) {
 //                ((TextView) activityReference.get().findViewById(R.id.caption_text))
 //                        .setText("Failed to init recognizer " + result);
-            } else {
-                activityReference.get().switchSearch(KWS_SEARCH);
-            }
-        }
-    }
-
-    private void switchSearch(String searchName) {
-        recognizer.stop();
-
-        // If we are not spotting, start listening with timeout (10000 ms or 10 seconds).
-        if (searchName.equals(KWS_SEARCH))
-            recognizer.startListening(searchName);
-        else
-            recognizer.startListening(searchName, 10000);
-
-        String caption = getResources().getString(captions.get(searchName));
-        ((TextView) findViewById(R.id.caption_text)).setText(caption);
-    }
-
-    private void setupRecognizer(File assetsDir) throws IOException {
-        // The recognizer can be configured to perform multiple searches
-        // of different kind and switch between them
-
-        recognizer = SpeechRecognizerSetup.defaultSetup()
-                .setAcousticModel(new File(assetsDir, "en-us-ptm"))
-                .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
-
-                .setRawLogDir(assetsDir) // To disable logging of raw audio comment out this call (takes a lot of space on the device)
-
-                .getRecognizer();
-        recognizer.addListener(this);
-
-        /* In your application you might not need to add all those searches.
-          They are added here for demonstration. You can leave just one.
-         */
-
-        // Create keyword-activation search.
-        recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
-
-        // Create grammar-based search for selection between demos
-        File menuGrammar = new File(assetsDir, "menu.gram");
-        recognizer.addGrammarSearch(MENU_SEARCH, menuGrammar);
-
-        // Create grammar-based search for digit recognition
-        File digitsGrammar = new File(assetsDir, "digits.gram");
-        recognizer.addGrammarSearch(DIGITS_SEARCH, digitsGrammar);
-
-        // Create language model search
-        File languageModel = new File(assetsDir, "weather.dmp");
-        recognizer.addNgramSearch(FORECAST_SEARCH, languageModel);
-
-        // Phonetic search
-        File phoneticModel = new File(assetsDir, "en-phone.dmp");
-        recognizer.addAllphoneSearch(PHONE_SEARCH, phoneticModel);
-    }
+//            } else {
+//                activityReference.get().doSomething();
+//            }
+//        }
+//    }
+//
+//    private void doSomething() {
+//        recognizer.stop();
+//        recognizer.startListening(KWS_SEARCH, 10000);
+//    }
+//
+//    private void setupRecognizer(File assetsDir) throws IOException {
+//        recognizer = SpeechRecognizerSetup.defaultSetup()
+//                .setAcousticModel(new File(assetsDir, "en-us-ptm"))
+//                .setDictionary(new File(assetsDir, "cmudict-en-us.dict"))
+//                .getRecognizer();
+//        recognizer.addListener(this);
+//
+//        recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
+//    }
 }

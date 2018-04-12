@@ -30,6 +30,8 @@ public class IntroActivity extends AppIntro {
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.WAKE_LOCK,
+                Manifest.permission.DISABLE_KEYGUARD,
         }, ASK_MULTIPLE_PERMISSION_REQUEST_CODE);
     }
 
